@@ -14,5 +14,3 @@ require (
 	github.com/lib/pq v1.10.9 // indirect
 	github.com/visvasity/syncmap v0.0.0-20241218025521-5599e6c230a7 // indirect
 )
-
-replace github.com/visvasity/kvpostgres => ../kvpostgres
