@@ -23,17 +23,6 @@ func cleanupPrefix(ctx context.Context, t testing.TB, db kv.Database, prefix str
 
 	begin, end := kvutil.PrefixRange(prefix)
 
-	snap, err := db.NewSnapshot(ctx)
-	if err != nil {
-		warn(t, "cleanupPrefix: NewSnapshot failed: %v", err)
-		return
-	}
-	defer func() {
-		if err := snap.Discard(ctx); err != nil {
-			warn(t, "cleanupPrefix: Snapshot.Discard failed: %v", err)
-		}
-	}()
-
 	tx, err := db.NewTransaction(ctx)
 	if err != nil {
 		warn(t, "cleanupPrefix: NewTransaction failed: %v", err)
@@ -48,7 +37,7 @@ func cleanupPrefix(ctx context.Context, t testing.TB, db kv.Database, prefix str
 	}()
 
 	var iterErr error
-	for key := range snap.Ascend(ctx, begin, end, &iterErr) {
+	for key := range tx.Ascend(ctx, begin, end, &iterErr) {
 		if err := tx.Delete(ctx, key); err != nil {
 			warn(t, "cleanupPrefix: Delete(%q) failed: %v", key, err)
 			// keep trying to delete the rest
